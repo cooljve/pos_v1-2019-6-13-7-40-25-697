@@ -4,8 +4,8 @@ const itemMenu = loadAllItems();
 const promotionMenu = loadPromotions();
 
 function printReceipt(tags) {
-  let handledTag = handleBarcodes(tags);
-  let itemsWithCount = findItems(handledTag, itemMenu);
+  let handledTagObject = handleBarcodes(tags);
+  let itemsWithCount = findItems(handledTagObject, itemMenu);
   let priceObject = calculatePrice(itemsWithCount, promotionMenu);
   console.log(createReceipt(priceObject, itemsWithCount));
 }
