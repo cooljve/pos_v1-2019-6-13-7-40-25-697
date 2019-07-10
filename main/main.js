@@ -13,17 +13,13 @@ function printReceipt(tags) {
 function handleBarcodes(tags) {
   let tagObj = {};
   tags.forEach((tag) => {
-    let location = tag.indexOf('-');
-    if (location > -1) {
-      let itemId = tag.substring(0, location);
-      let itemWeight = parseFloat(tag.substring(location + 1));
-      if (tagObj[itemId] == undefined) {
-        tagObj[itemId] = itemWeight;
-      } else {
-        tagObj[itemId] += itemWeight;
-      }
+    if (tag.indexOf('-') > -1) {
+      let arr = tag.split('-');
+      let itemId = arr[0];
+      let itemWeight = parseFloat(arr[1]);
+      tagObj[itemId] = tagObj[itemId] === undefined ? itemWeight : tagObj[itemId] + itemWeight;
     } else {
-      tagObj[tag] = tagObj[tag] == undefined ? 1 : tagObj[tag] += 1;
+      tagObj[tag] = tagObj[tag] === undefined ? 1 : tagObj[tag] + 1;
     }
   });
   return tagObj;
