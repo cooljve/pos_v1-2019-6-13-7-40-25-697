@@ -6,8 +6,8 @@ const promotionMenu = loadPromotions();
 function printReceipt(tags) {
   let handledTag = handleBarcodes(tags);
   let itemsWithCount = findItems(handledTag, itemMenu);
-  let priceObject = selectPromotion(itemsWithCount, promotionMenu);
-  console.log(createReceipt(priceObject,itemsWithCount));
+  let priceObject = calculatePrice(itemsWithCount, promotionMenu);
+  console.log(createReceipt(priceObject, itemsWithCount));
 }
 
 function handleBarcodes(tags) {
@@ -32,28 +32,28 @@ function handleBarcodes(tags) {
 function findItems(barcodeObject, itemMenu) {
   let itemsWithCount = [];
   for (let item of itemMenu) {
-    item['count'] = barcodeObject[item.barcode];
+    item.count = barcodeObject[item.barcode];
     itemsWithCount.push(item);
   }
-  return itemsWithCount.filter((num)=>num.count == undefined ? false : true);
+  return itemsWithCount.filter((num) => num.count == undefined ? false : true);
 }
 
-function selectPromotion(itemsWithCount, promotionMenu) {
+function calculatePrice(itemsWithCount, promotionMenu) {
   let priceObj = {};
   let oldPrice = 0;
   let savePrice = 0;
   for (let promotion of promotionMenu) {
     for (let item of itemsWithCount) {
-      item['total'] = item.count * item.price;
-      oldPrice += item['total'];
+      item.total = item.count * item.price;
+      oldPrice += item.total;
       if (promotion.barcodes.indexOf(item.barcode) > -1) {
-        item['total'] = Math.ceil((2 / 3) * item.count * item.price)
-        savePrice += item.count * item.price - item['item'];
+        item.total = Math.ceil((2 / 3) * item.count) * item.price;
+        savePrice += item.count * item.price - item.total;
       }
     }
   }
-  priceObj['oldPrice'] = oldPrice;
-  priceObj['savePrice'] = savePrice;
+  priceObj.oldPrice = oldPrice;
+  priceObj.savePrice = savePrice;
   return priceObj;
 }
 
@@ -61,12 +61,12 @@ function createReceipt(priceObject, itemsWithCount) {
   let receipt = `***<没钱赚商店>收据***
 `;
   for (let item of itemsWithCount) {
-    receipt += `名称：${item.name}，数量：${item.count}${item.unit}，单价：${item.price}(元)，小计：${item.total}(元)
+    receipt += `名称：${item.name}，数量：${item.count}${item.unit}，单价：${item.price.toFixed(2)}(元)，小计：${parseFloat(item.total).toFixed(2)}(元)
 `;
   }
-  receipt+=`----------------------
-总计：${priceObject.oldPrice-priceObject.savePrice}（元）
-节省：${priceObject.savePrice}（元）
+  receipt += `----------------------
+总计：${(priceObject.oldPrice - priceObject.savePrice).toFixed(2)}(元)
+节省：${priceObject.savePrice.toFixed(2)}(元)
 **********************`
   return receipt;
 }
